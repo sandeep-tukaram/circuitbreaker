@@ -19,3 +19,22 @@ Service A calls B, B throws exception upon multiple retries.  Two major concerns
 3. It maintains a retry threshold, above which the retries are blocked. 
 4. The block is partially removed after a certain configured open_time.  At this moment, the circuit is half-openend. Few of the requests are allowed. If the request exception reoccurs, the circuit is opened again. Step 4 runs in a loop. 
 5. If at the half-opened, requests are succesful then the circuit is closed to allow normalcy.
+
+## Circuit Breaker Design - State Machine
+Two aspects of the state machine
+1. State    ->   OPEN, HALF-OPEN, CLOSED
+2. Transitions 
+
+                 (a)
+                ---->      OPEN 
+        CLOSED            (b) | (c)
+                <----     Half OPEN
+                 (d)     
+
+(a) Closed to Open -> The failure counts reach a threshold. The state transitions to Open.
+(b) Open to Half Open -> The open circuit timeouts. The state transitions to half open.
+(c) Half Open to Open -> The halfopen request fails. The state transitions back to open.
+(d) Half Open to Close -> The halfopen request succeeds. The state transitions to closed. 
+
+3. Transition entry
+    The entry can be at any of the state. In other words, when a request is submitted to the circuit breaker. The state of the machine can any of the OPEN, CLOSED and HALF OPEN. The state machine has to handle the request accordingly. 
