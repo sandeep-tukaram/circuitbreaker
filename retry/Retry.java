@@ -6,6 +6,8 @@ import service.ServiceException;
 
 public class Retry {
 
+    
+
     public static <Q, S> Optional<S> handle(Service service, Q request, int RETRY_THRESHOLD, long RETRY_WAIT) throws RetryThresholdException, InterruptedException {
         Optional<S> response = Optional.empty();
         int retry = 0;
