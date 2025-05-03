@@ -3,8 +3,8 @@ import java.util.Optional;
 
 import cb.CircuitBreaker;
 import cb.CircuitBreakerConfig;
-import exceptions.CircuitOpenException;
-import exceptions.RetryThresholdException;
+import cb.CircuitOpenException;
+import retry.RetryThresholdException;
 
 // Represents Circuit Open state. 
 // Handle transition. Open -> HalfOpen.

@@ -1,9 +1,8 @@
 package retry;
 import java.util.Optional;
 
-import cb.Service;
-import exceptions.RetryThresholdException;
-import exceptions.ServiceException;
+import service.Service;
+import service.ServiceException;
 
 public class Retry {
 

@@ -4,10 +4,10 @@ import java.util.Optional;
 
 import cb.CircuitBreaker;
 import cb.CircuitBreakerConfig;
-import cb.Service;
-import exceptions.CircuitOpenException;
-import exceptions.RetryThresholdException;
+import cb.CircuitOpenException;
 import retry.Retry;
+import retry.RetryThresholdException;
+import service.Service;
 
 public class CircuitClosed implements CircuitState {
 

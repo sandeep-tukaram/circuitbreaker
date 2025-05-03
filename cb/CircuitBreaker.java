@@ -6,8 +6,8 @@ import cb.state.CircuitHalfOpen;
 import cb.state.CircuitOpen;
 import cb.state.CircuitState;
 import cb.state.CircuitStateEnum;
-import exceptions.CircuitOpenException;
-import exceptions.RetryThresholdException;
+import retry.RetryThresholdException;
+import service.Service;
 
 public class CircuitBreaker {
     

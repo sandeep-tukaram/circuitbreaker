@@ -1,4 +1,4 @@
-package exceptions;
+package retry;
 
 public class RetryThresholdException extends Exception {
 

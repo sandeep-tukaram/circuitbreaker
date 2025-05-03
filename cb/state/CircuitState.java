@@ -3,8 +3,8 @@ package cb.state;
 
 import java.util.Optional;
 
-import exceptions.CircuitOpenException;
-import exceptions.RetryThresholdException;
+import cb.CircuitOpenException;
+import retry.RetryThresholdException;
 
 public interface CircuitState {
 

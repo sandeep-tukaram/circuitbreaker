@@ -1,4 +1,4 @@
-package exceptions;
+package cb;
 
 public class CircuitOpenException extends Exception {
 
