@@ -6,7 +6,6 @@ import cb.state.CircuitHalfOpen;
 import cb.state.CircuitOpen;
 import cb.state.CircuitState;
 import cb.state.CircuitStateEnum;
-import retry.Retry;
 import retry.RetryConfig;
 import retry.RetryThresholdException;
 import service.Service;
