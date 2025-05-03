@@ -6,6 +6,7 @@ import cb.CircuitBreaker;
 import cb.CircuitBreakerConfig;
 import cb.CircuitOpenException;
 import retry.Retry;
+import retry.RetryConfig;
 import retry.RetryThresholdException;
 import service.Service;
 
@@ -22,6 +23,7 @@ public class CircuitClosed implements CircuitState {
     public <Q, S> Optional<S> handle(Q request) throws CircuitOpenException, InterruptedException {
         Service service = this.circuitBreaker.getService();
         CircuitBreakerConfig configs = this.circuitBreaker.getConfigs();
+        RetryConfig retryConfig = this.circuitBreaker.getRetryConfig();
 
         if(this.serviceFailCounter.get(service) == null) {
             this.serviceFailCounter.put(service, 0);
@@ -38,11 +40,11 @@ public class CircuitClosed implements CircuitState {
 
 
             try {
-                response = Retry.handle(service, request, configs.RETRY_THRESHOLD, configs.RETRY_WAIT_MS);
+                response = Retry.handle(service, request, retryConfig);
                 this.serviceFailCounter.put(service,0);    // reset failure counts upon successful service response.
                 break;
             } catch (RetryThresholdException rt) {
-                this.serviceFailCounter.compute(service, (key, value) ->value + configs.RETRY_THRESHOLD);
+                this.serviceFailCounter.compute(service, (key, value) ->value + retryConfig.getRETRY_THRESHOLD());
             }            
         }
 

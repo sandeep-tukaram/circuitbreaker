@@ -5,6 +5,7 @@ import cb.CircuitBreaker;
 import cb.CircuitBreakerConfig;
 import cb.CircuitOpenException;
 import retry.Retry;
+import retry.RetryConfig;
 import retry.RetryThresholdException;
 import service.Service;
 
@@ -20,6 +21,7 @@ public class CircuitHalfOpen implements CircuitState {
         public  <Q, S> Optional<S> handle(Q request) throws CircuitOpenException, RetryThresholdException, InterruptedException {
             Service service = this.circuitBreaker.getService();
             CircuitBreakerConfig configs = this.circuitBreaker.getConfigs();
+            RetryConfig retryConfig = this.circuitBreaker.getRetryConfig();
 
             // Open the circuit
             if (failCount >= configs.HALF_OPEN_THRESHOLD) {
@@ -33,7 +35,7 @@ public class CircuitHalfOpen implements CircuitState {
             Optional<S> response = Optional.empty();
             if (failCount < configs.HALF_OPEN_THRESHOLD) {
                 try {
-                    response =  Retry.handle(service, request, configs.RETRY_THRESHOLD, configs.RETRY_WAIT_MS);
+                    response =  Retry.handle(service, request, retryConfig);
                     this.successCount++;
                 } finally {
                     this.failCount++;
