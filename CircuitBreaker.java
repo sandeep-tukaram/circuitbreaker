@@ -9,22 +9,22 @@ public class CircuitBreaker<Q> {
         this.configs = configs;
     }
 
-    public <Q, S> Optional<S> execute(Service service, Q request) {
+    // Retry mechanism.
+    public <Q, S> Optional<S> retry(Service service, Q request) throws RetryThresholdException {
         Optional<S> response = Optional.empty();
         int retry = 0;
 
         while(true) {
             try {
                 response =  service.run(request);
+                return response;
             } catch (ServiceException s) {
                 if (circuitState == CircuitState.CLOSED && retry > this.configs.RETRY_THRESHOLD) {
-                    break;
+                    throw new RetryThresholdException("Retry threshold hit!");
                 } {
                     retry++;
                 }
             }
         }
-
-        return response;
     }
 }
