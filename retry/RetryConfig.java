@@ -1,10 +1,10 @@
 package retry;
 
 public class RetryConfig {
-    public final long RETRY_WAIT_MS;
-    public final int RETRY_THRESHOLD;
+    private final long RETRY_WAIT_MS;
+    private final int RETRY_THRESHOLD;
 
-    RetryConfig(long wait_ms, int count) {
+    public RetryConfig(long wait_ms, int count) {
         this.RETRY_THRESHOLD = count;
         this.RETRY_WAIT_MS = wait_ms;
     }
