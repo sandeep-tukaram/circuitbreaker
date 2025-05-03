@@ -1,7 +1,12 @@
+package state;
 import java.util.Optional;
 
+import cb.CircuitBreaker;
+import cb.CircuitBreakerConfig;
+import cb.Service;
 import exceptions.CircuitOpenException;
 import exceptions.RetryThresholdException;
+import retry.Retry;
 
 public class CircuitHalfOpen implements CircuitState {
         private final CircuitBreaker circuitBreaker;

@@ -1,3 +1,4 @@
+package state;
 // Represents circuit state.
 
 import java.util.Optional;

@@ -1,3 +1,4 @@
+package cb;
 // Represents a service. A calls service B. The circuitBreaker 
 // Q -> reQuest object type
 // S -> reSponse object type

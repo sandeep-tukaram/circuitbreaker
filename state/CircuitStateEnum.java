@@ -1,3 +1,4 @@
+package state;
 public enum  CircuitStateEnum {
     OPEN,
     CLOSED,

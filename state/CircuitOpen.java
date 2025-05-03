@@ -1,5 +1,8 @@
+package state;
 import java.util.Optional;
 
+import cb.CircuitBreaker;
+import cb.CircuitBreakerConfig;
 import exceptions.CircuitOpenException;
 import exceptions.RetryThresholdException;
 

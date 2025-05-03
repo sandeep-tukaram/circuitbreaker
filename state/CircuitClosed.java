@@ -1,8 +1,13 @@
+package state;
 import java.util.Map;
 import java.util.Optional;
 
+import cb.CircuitBreaker;
+import cb.CircuitBreakerConfig;
+import cb.Service;
 import exceptions.CircuitOpenException;
 import exceptions.RetryThresholdException;
+import retry.Retry;
 
 public class CircuitClosed implements CircuitState {
 

@@ -1,3 +1,4 @@
+package cb;
 
 public class CircuitBreakerConfig {
 
