@@ -36,5 +36,35 @@ Two aspects of the state machine
 (c) Half Open to Open -> The halfopen request fails. The state transitions back to open.
 (d) Half Open to Close -> The halfopen request succeeds. The state transitions to closed. 
 
-3. Transition entry
-    The entry can be at any of the state. In other words, when a request is submitted to the circuit breaker. The state of the machine can any of the OPEN, CLOSED and HALF OPEN. The state machine has to handle the request accordingly. 
+3. Entry states
+    When a request is submitted to the circuit breaker, the state of the machine can any of the OPEN, CLOSED or HALF OPEN. The state machine has to handle the request accordingly. 
+
+                                OPEN  <- A()
+        A() ->  CLOSED 
+                                HALF OPEN  <- A()     
+
+
+4. External Service Request states
+    a. Only HalfOpen and Closed state can make external service requests.
+
+                        OPEN
+       B() <--> CLOSED
+                        HALF OPEN <--> B()
+
+5. Return states
+        Responses should be reqtured from any of the states. Conforms to the request-response model (point 3)
+                                OPEN  -> A()
+        A() <-  CLOSED 
+                                HALF OPEN  -> A()     
+
+                        
+6. Conslidated Model 
+
+                                 (2a)                              
+                                ----->              OPEN  <---> A()   
+        A()   <--->                                   |
+                CLOSED                           (2b) | (2c)
+        B()   <--->                                   |
+                                <-----          Half OPEN <---> A()
+                                  (2d)                    <---> B()
+

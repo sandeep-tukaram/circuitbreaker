@@ -1,51 +1,60 @@
 import java.util.Optional;
 
-public class CircuitBreaker<Q> {
+public class CircuitBreaker {
     
-    private CircuitState circuitState = CircuitState.CLOSED;
-    private CircuitBreakerConfig configs;
-    private long openedInstant;  // instant when the circuit was first opened
-    private int halfOpenRequestCount = 0; // halfOpen request counter
-    private Retry retry;
+    private final CircuitBreakerConfig configs;
+    private CircuitState circuitOpen, circuitHalfOpen, circuitClosed, currentState;
 
-    public CircuitBreaker(CircuitBreakerConfig configs) {
+    // mapped/coupled service object.
+    private final Service service;
+
+    // private constructor. The state objects needs this object for instantiation.
+    // Alternative is to provide an init() method, but a client may fail to invoke it.
+    private CircuitBreaker(CircuitBreakerConfig configs, Service service) {
         this.configs = configs;
+        this.service = service;
     }
 
-    public  <Q, S> Optional<S> execute(Service service, Q request) throws CircuitOpenException, RetryThresholdException {
-        // TODO -> Encapsulate state and transitions.
-        // Transition -> Open to Half Open
-        if (this.circuitState == CircuitState.OPEN) {
-            if ((System.currentTimeMillis() - openedInstant) < this.configs.OPEN_WAIT_TIME_MS) {
-                // Accept no more reqeusts until open wait period
-                throw new CircuitOpenException("Retry after - " + 
-                                (this.configs.OPEN_WAIT_TIME_MS - ((System.currentTimeMillis() - openedInstant))));
-            } 
-            this.circuitState = CircuitState.HALF_OPEN;
-        }
+    // Factory method
+    public static CircuitBreaker getInstance(CircuitBreakerConfig configs, Service service) {
+        CircuitBreaker cb_instance = new CircuitBreaker(configs, service);
 
-        // TODD -> Looks buggy. Revisit the logic. 
-        if (this.circuitState == CircuitState.HALF_OPEN && halfOpenRequestCount <= this.configs.HALF_OPEN_THRESHOLD) {
-            try {
-                return retry.handle(service, request);
-            } finally {
-                this.halfOpenRequestCount++;
-            }
-        }
-        // Transition -> Half Open back to Open 
-        else if (this.circuitState == CircuitState.HALF_OPEN && halfOpenRequestCount > this.configs.HALF_OPEN_THRESHOLD) {
-            // maximum half open request threshold exhausted. Open the circuit
-            this.circuitState = CircuitState.OPEN;
-            this.halfOpenRequestCount = 0;
-        } 
-        // Transition -> Half Open to Closed
-        else {
-            this.circuitState = CircuitState.CLOSED;
-            this.halfOpenRequestCount = 0;  // reset halfOpen request counter
-        }
+        // Initialize and set all circuit state objects
+        cb_instance.circuitOpen = new CircuitOpen(cb_instance);
+        cb_instance.circuitHalfOpen = new CircuitHalfOpen(cb_instance);
+        cb_instance.circuitClosed = new CircuitClosed(cb_instance);
 
-        // TODO handle transition from Closed to Open
-        return retry.handle(service, request);
+        return cb_instance;
+    }
+
+    public  <Q, S> Optional<S> handle(Q request) throws CircuitOpenException, InterruptedException, RetryThresholdException {
+        return this.getState().handle(request);
+    }
+
+    public void transition(CircuitStateEnum circuitStateEnum) {
+        switch (circuitStateEnum) {
+            case OPEN:
+                this.currentState = this.circuitOpen;
+                ((CircuitOpen)this.circuitOpen).setOpenedInstant();
+                break;
+            case HALF_OPEN:
+                this.currentState = this.circuitHalfOpen;
+                break;
+            default:
+                this.currentState = this.circuitClosed;
+        }
+    }
+
+    public CircuitState getState() {
+        return this.currentState;
+    }
+
+    public Service getService() {
+        return this.service;
+    }
+
+    public CircuitBreakerConfig getConfigs() {
+        return this.configs;
     }
 
 }

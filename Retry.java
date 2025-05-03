@@ -1,15 +1,8 @@
 import java.util.Optional;
 
-// Retry mechanism
 public class Retry {
 
-    private CircuitBreakerConfig configs;
-
-    public Retry(CircuitBreakerConfig configs) {
-        this.configs = configs;
-    }
-
-    public <Q, S> Optional<S> handle(Service service, Q request) throws RetryThresholdException {
+    public static <Q, S> Optional<S> handle(Service service, Q request, int RETRY_THRESHOLD, long RETRY_WAIT) throws RetryThresholdException, InterruptedException {
         Optional<S> response = Optional.empty();
         int retry = 0;
 
@@ -18,12 +11,13 @@ public class Retry {
                 response =  service.run(request);
                 return response;
             } catch (ServiceException s) {
-                if (retry > this.configs.RETRY_THRESHOLD) {
+                if (retry > RETRY_THRESHOLD) {
                     throw new RetryThresholdException("Retry threshold hit!", s);
                 } {
                     retry++;
                 }
             }
+            Thread.sleep(RETRY_WAIT);
         }
     }
 
