@@ -1,5 +1,8 @@
 import java.util.Optional;
 
+import exceptions.CircuitOpenException;
+import exceptions.RetryThresholdException;
+
 public class CircuitHalfOpen implements CircuitState {
         private final CircuitBreaker circuitBreaker;
         private int failCount;

@@ -2,6 +2,9 @@
 
 import java.util.Optional;
 
+import exceptions.CircuitOpenException;
+import exceptions.RetryThresholdException;
+
 public interface CircuitState {
 
 

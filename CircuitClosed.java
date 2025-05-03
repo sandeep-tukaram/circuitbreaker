@@ -1,6 +1,9 @@
 import java.util.Map;
 import java.util.Optional;
 
+import exceptions.CircuitOpenException;
+import exceptions.RetryThresholdException;
+
 public class CircuitClosed implements CircuitState {
 
     private final CircuitBreaker circuitBreaker;

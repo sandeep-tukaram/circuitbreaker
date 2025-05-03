@@ -1,5 +1,8 @@
 import java.util.Optional;
 
+import exceptions.CircuitOpenException;
+import exceptions.RetryThresholdException;
+
 // Represents Circuit Open state. 
 // Handle transition. Open -> HalfOpen.
 public class CircuitOpen implements CircuitState {
