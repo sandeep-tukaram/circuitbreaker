@@ -6,9 +6,7 @@ import service.ServiceException;
 
 public class Retry {
 
-    
-
-    public static <Q, S> Optional<S> handle(Service service, Q request, int RETRY_THRESHOLD, long RETRY_WAIT) throws RetryThresholdException, InterruptedException {
+    public static <Q, S> Optional<S> handle(Service service, Q request, RetryConfig retryConfig) throws RetryThresholdException, InterruptedException {
         Optional<S> response = Optional.empty();
         int retry = 0;
 
@@ -17,13 +15,13 @@ public class Retry {
                 response =  service.run(request);
                 return response;
             } catch (ServiceException s) {
-                if (retry > RETRY_THRESHOLD) {
+                if (retry > retryConfig.getRETRY_THRESHOLD()) {
                     throw new RetryThresholdException("Retry threshold hit!", s);
                 } {
                     retry++;
                 }
             }
-            Thread.sleep(RETRY_WAIT);
+            Thread.sleep(retryConfig.getRETRY_WAIT_MS());
         }
     }
 
