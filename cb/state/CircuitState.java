@@ -1,4 +1,4 @@
-package state;
+package cb.state;
 // Represents circuit state.
 
 import java.util.Optional;

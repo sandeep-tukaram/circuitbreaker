@@ -1,13 +1,13 @@
 package cb;
 import java.util.Optional;
 
+import cb.state.CircuitClosed;
+import cb.state.CircuitHalfOpen;
+import cb.state.CircuitOpen;
+import cb.state.CircuitState;
+import cb.state.CircuitStateEnum;
 import exceptions.CircuitOpenException;
 import exceptions.RetryThresholdException;
-import state.CircuitClosed;
-import state.CircuitHalfOpen;
-import state.CircuitOpen;
-import state.CircuitState;
-import state.CircuitStateEnum;
 
 public class CircuitBreaker {
     

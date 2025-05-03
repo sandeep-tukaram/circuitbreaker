@@ -1,4 +1,4 @@
-package state;
+package cb.state;
 import java.util.Optional;
 
 import cb.CircuitBreaker;

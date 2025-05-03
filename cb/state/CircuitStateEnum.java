@@ -1,4 +1,4 @@
-package state;
+package cb.state;
 public enum  CircuitStateEnum {
     OPEN,
     CLOSED,
