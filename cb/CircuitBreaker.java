@@ -14,12 +14,12 @@ import service.Service;
 public class CircuitBreaker {
     
     private final CircuitBreakerConfig configs;
-    private final RetryConfig retryConfig;      // ADR -> CB encapsulates Retry
+    private final RetryConfig retryConfig;      // ADR -> CB encapsulates Retry.
+    private final Service service;      // ADR -> coupled service.
 
     
     // ADR -> Encapsulated circuit states.
     private CircuitState circuitOpen, circuitHalfOpen, circuitClosed, currentState;
-    private final Service service;      // ADR -> coupled service object.
 
     private CircuitBreaker(CircuitBreakerConfig configs, Service service, RetryConfig retryConfig) {
         this.configs = configs;
