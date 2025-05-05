@@ -44,7 +44,7 @@ public class CircuitBreaker {
         cb_instance.circuitClosed = new CircuitClosed(cb_instance);
 
         // Initialize current state to CLOSED
-        cb_instance.currentState = cb_instance.circuitClosed;
+        cb_instance.currentState = cb_instance.transition(CircuitStateEnum.CLOSED);
 
         return cb_instance;
     }
@@ -65,6 +65,8 @@ public class CircuitBreaker {
             default:
                 this.currentState = this.circuitClosed;
         }
+
+        
 
         return this.currentState;
     }
