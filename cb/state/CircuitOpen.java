@@ -25,7 +25,7 @@ public class CircuitOpen implements CircuitState {
             if (openedInstant != -1l) {
                 if ((System.currentTimeMillis() - openedInstant) <= configs.OPEN_WAIT_TIME_MS) {
                     // circuit is still open
-                    throw new CircuitOpenException("Retry after - " + 
+                    throw new CircuitOpenException("Circuit Open. Retry after - " + 
                                     (configs.OPEN_WAIT_TIME_MS - ((System.currentTimeMillis() - openedInstant))));
                 } else {
                     // open timed out
