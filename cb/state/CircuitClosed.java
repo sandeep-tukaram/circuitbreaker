@@ -1,6 +1,7 @@
 package cb.state;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeoutException;
 
 import cb.CircuitBreaker;
 import cb.CircuitBreakerConfig;
@@ -20,7 +21,7 @@ public class CircuitClosed implements CircuitState {
     }
 
     @Override
-    public <Q, S> Optional<S> handle(Q request) throws CircuitOpenException, InterruptedException {
+    public <Q, S> Optional<S> handle(Q request) throws CircuitOpenException, InterruptedException, TimeoutException {
         Service service = this.circuitBreaker.getService();
         CircuitBreakerConfig configs = this.circuitBreaker.getConfigs();
         RetryConfig retryConfig = this.circuitBreaker.getRetryConfig();

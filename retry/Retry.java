@@ -1,12 +1,13 @@
 package retry;
 import java.util.Optional;
+import java.util.concurrent.TimeoutException;
 
 import service.Service;
 import service.ServiceException;
 
 public class Retry {
 
-    public static <Q, S> Optional<S> handle(Service service, Q request, RetryConfig retryConfig) throws RetryThresholdException, InterruptedException {
+    public static <Q, S> Optional<S> handle(Service service, Q request, RetryConfig retryConfig) throws RetryThresholdException, InterruptedException, TimeoutException {
         Optional<S> response = Optional.empty();
         int retry = 0;
 

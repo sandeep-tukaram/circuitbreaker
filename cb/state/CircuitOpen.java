@@ -1,5 +1,6 @@
 package cb.state;
 import java.util.Optional;
+import java.util.concurrent.TimeoutException;
 
 import cb.CircuitBreaker;
 import cb.CircuitBreakerConfig;
@@ -17,7 +18,7 @@ public class CircuitOpen implements CircuitState {
             this.circuitBreaker = circuitBreaker;
         }
 
-        public  <Q, S> Optional<S> handle(Q request) throws CircuitOpenException, InterruptedException, RetryThresholdException {
+        public  <Q, S> Optional<S> handle(Q request) throws CircuitOpenException, InterruptedException, RetryThresholdException, TimeoutException {
             CircuitBreakerConfig configs = this.circuitBreaker.getConfigs();
 
             // check open state
