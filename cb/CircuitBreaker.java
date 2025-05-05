@@ -8,6 +8,8 @@ import cb.state.CircuitHalfOpen;
 import cb.state.CircuitOpen;
 import cb.state.CircuitState;
 import cb.state.CircuitStateEnum;
+import event.Event;
+import event.EventBus;
 import retry.RetryConfig;
 import retry.RetryThresholdException;
 import service.Service;
@@ -15,16 +17,20 @@ import service.ServiceException;
 
 public class CircuitBreaker {
     
-    // ADR -> Dependency Inject
+    // ADR -> Dependency Inject configs and wrap service and fallback service.
     private final CircuitBreakerConfig configs;
     private final RetryConfig retryConfig;      // ADR -> CB encapsulates Retry.
     private final Service service;      // ADR -> coupled service.
     private final Failure failureStrategy;
     private final Service fallBack;
 
-
     // ADR -> encapsulated circuit states directed graph
     private CircuitState circuitOpen, circuitHalfOpen, circuitClosed, currentState;
+
+
+    // ADR -> event system for circuit state
+    private EventBus<CircuitState> eventBus;
+
 
     private CircuitBreaker(CircuitBreakerConfig configs, RetryConfig retryConfig, Service service, Failure failureStrategy, Service fallBack) {
         this.configs = configs;
@@ -66,8 +72,8 @@ public class CircuitBreaker {
                 this.currentState = this.circuitClosed;
         }
 
-        
-
+        // publish state change
+        this.eventBus.publish(new Event<CircuitState>(this.currentState));
         return this.currentState;
     }
 
