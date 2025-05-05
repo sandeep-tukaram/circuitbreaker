@@ -22,9 +22,9 @@ public class CircuitOpen implements CircuitState {
         public  <Q, S> Optional<S> handle(Q request) throws CircuitOpenException, InterruptedException, RetryThresholdException, TimeoutException, ServiceException {
             CircuitBreakerConfig configs = this.circuitBreaker.getConfigs();
 
-            // check open state
             if (openedInstant != -1l) {
                 if ((System.currentTimeMillis() - openedInstant) <= configs.getOPEN_WAIT_TIME_MS()) {
+                    // circuit is open
                     if (this.circuitBreaker.getFallBack() == null) {
                         throw new CircuitOpenException("Circuit Open. Retry after - " + 
                         (configs.getOPEN_WAIT_TIME_MS() - ((System.currentTimeMillis() - openedInstant))));
