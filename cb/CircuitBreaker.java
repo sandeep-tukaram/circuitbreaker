@@ -14,33 +14,30 @@ import service.Service;
 public class CircuitBreaker {
     
     private final CircuitBreakerConfig configs;
-    
+    private final RetryConfig retryConfig;      // ADR -> CB encapsulates Retry
+
     
     // ADR -> Encapsulated circuit states.
     private CircuitState circuitOpen, circuitHalfOpen, circuitClosed, currentState;
+    private final Service service;      // ADR -> coupled service object.
 
-    // mapped/coupled service object.
-    private final Service service;
-
-    // ADR -> CB encapsulates Retry
-    private final RetryConfig retryConfig;
-
-    // private constructor. The state objects needs this object for instantiation.
-    // Alternative is to provide an init() method, but a client may fail to invoke it.
     private CircuitBreaker(CircuitBreakerConfig configs, Service service, RetryConfig retryConfig) {
         this.configs = configs;
         this.service = service;
         this.retryConfig = retryConfig;
     }
 
-    // Factory method
+    // Factory method - better than an init(), which a client may fail to invoke.
     public static CircuitBreaker getInstance(CircuitBreakerConfig configs, Service service, RetryConfig retryConfig) {
         CircuitBreaker cb_instance = new CircuitBreaker(configs, service, retryConfig);
 
-        // Initialize and set all circuit state objects
+        //  Static Coupling -> set all circuit states
         cb_instance.circuitOpen = new CircuitOpen(cb_instance);
         cb_instance.circuitHalfOpen = new CircuitHalfOpen(cb_instance);
         cb_instance.circuitClosed = new CircuitClosed(cb_instance);
+
+        // Initialize current state to CLOSED
+        cb_instance.currentState = cb_instance.circuitClosed;
 
         return cb_instance;
     }
