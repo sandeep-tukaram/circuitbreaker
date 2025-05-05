@@ -1,5 +1,6 @@
 package cb;
 import java.util.Optional;
+import java.util.concurrent.TimeoutException;
 
 import cb.state.CircuitClosed;
 import cb.state.CircuitHalfOpen;
@@ -39,7 +40,7 @@ public class CircuitBreaker {
         return cb_instance;
     }
 
-    public  <Q, S> Optional<S> handle(Q request) throws CircuitOpenException, InterruptedException, RetryThresholdException {
+    public  <Q, S> Optional<S> handle(Q request) throws CircuitOpenException, InterruptedException, RetryThresholdException, TimeoutException {
         return this.getState().handle(request);
     }
 
