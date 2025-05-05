@@ -38,7 +38,7 @@ public class CircuitOpen implements CircuitState {
             return this.circuitBreaker.getState().handle(request);
         }
 
-        public void setOpenedInstant() {
+        public void init() {
             this.openedInstant = System.currentTimeMillis();
         }
     

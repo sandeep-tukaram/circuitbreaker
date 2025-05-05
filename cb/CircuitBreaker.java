@@ -48,7 +48,7 @@ public class CircuitBreaker {
         switch (circuitStateEnum) {
             case OPEN:
                 this.currentState = this.circuitOpen;
-                ((CircuitOpen)this.circuitOpen).setOpenedInstant();
+                ((CircuitOpen)this.circuitOpen).init();
                 break;
             case HALF_OPEN:
                 this.currentState = this.circuitHalfOpen;
