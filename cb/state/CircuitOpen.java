@@ -6,6 +6,7 @@ import cb.CircuitBreaker;
 import cb.CircuitBreakerConfig;
 import cb.CircuitOpenException;
 import retry.RetryThresholdException;
+import service.ServiceException;
 
 // Represents Circuit Open state. 
 // Handle transition. Open -> HalfOpen.
@@ -18,15 +19,20 @@ public class CircuitOpen implements CircuitState {
             this.circuitBreaker = circuitBreaker;
         }
 
-        public  <Q, S> Optional<S> handle(Q request) throws CircuitOpenException, InterruptedException, RetryThresholdException, TimeoutException {
+        public  <Q, S> Optional<S> handle(Q request) throws CircuitOpenException, InterruptedException, RetryThresholdException, TimeoutException, ServiceException {
             CircuitBreakerConfig configs = this.circuitBreaker.getConfigs();
 
             // check open state
             if (openedInstant != -1l) {
-                if ((System.currentTimeMillis() - openedInstant) <= configs.OPEN_WAIT_TIME_MS) {
-                    // circuit is still open
-                    throw new CircuitOpenException("Circuit Open. Retry after - " + 
-                                    (configs.OPEN_WAIT_TIME_MS - ((System.currentTimeMillis() - openedInstant))));
+                if ((System.currentTimeMillis() - openedInstant) <= configs.getOPEN_WAIT_TIME_MS()) {
+                    if (this.circuitBreaker.getFallBack() == null) {
+                        throw new CircuitOpenException("Circuit Open. Retry after - " + 
+                        (configs.getOPEN_WAIT_TIME_MS() - ((System.currentTimeMillis() - openedInstant))));
+                    }
+
+                    // invoke fallback
+                    return this.circuitBreaker.getFallBack().run(request);
+
                 } else {
                     // open timed out
                     this.openedInstant = -1l;

@@ -5,31 +5,32 @@ import java.util.concurrent.TimeoutException;
 import cb.CircuitBreaker;
 import cb.CircuitBreakerConfig;
 import cb.CircuitOpenException;
+import cb.fail.Failure;
 import retry.Retry;
 import retry.RetryConfig;
 import retry.RetryThresholdException;
 import service.Service;
+import service.ServiceException;
 
 public class CircuitHalfOpen implements CircuitState {
         private final CircuitBreaker circuitBreaker;
-        private int failCount;
         private int successCount;
 
         public CircuitHalfOpen(CircuitBreaker circuitBreaker) {
             this.circuitBreaker = circuitBreaker;
         }
 
-        public  <Q, S> Optional<S> handle(Q request) throws CircuitOpenException, RetryThresholdException, InterruptedException, TimeoutException {
+        public  <Q, S> Optional<S> handle(Q request) throws CircuitOpenException, RetryThresholdException, InterruptedException, TimeoutException, ServiceException {
             Service service = this.circuitBreaker.getService();
             CircuitBreakerConfig configs = this.circuitBreaker.getConfigs();
             RetryConfig retryConfig = this.circuitBreaker.getRetryConfig();
-
+            Failure failureStrategy = this.circuitBreaker.getFailureStrategy();
 
             Optional<S> response = Optional.empty();
 
             // Static coupling -> Transition to Open circuit when failures hit threshold
-            if (failCount > configs.HALF_OPEN_THRESHOLD) {
-                this.failCount = 0;
+            if (failureStrategy.hitThreshold()) {
+                failureStrategy.reset();
                 response =  this.circuitBreaker.transition(CircuitStateEnum.OPEN).handle(request);
             }
             
@@ -38,12 +39,12 @@ public class CircuitHalfOpen implements CircuitState {
                 response =  Retry.handle(service, request, retryConfig);
                 this.successCount += retryConfig.getRETRY_THRESHOLD();
             } catch (Exception e) {
-                this.failCount += retryConfig.getRETRY_THRESHOLD();
+                failureStrategy.increment(retryConfig.getRETRY_THRESHOLD());
                 throw e;
             }
 
             // Static coupling -> Trasition to Closed circuit when success hit threshold
-            if (this.successCount > configs.HALF_OPEN_THRESHOLD) {
+            if (this.successCount > configs.getHALF_OPEN_THRESHOLD()) {
                 this.successCount = 0;
                 response = this.circuitBreaker.transition(CircuitStateEnum.CLOSED).handle(request);
             }

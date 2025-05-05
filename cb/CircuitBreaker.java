@@ -2,6 +2,7 @@ package cb;
 import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 
+import cb.fail.Failure;
 import cb.state.CircuitClosed;
 import cb.state.CircuitHalfOpen;
 import cb.state.CircuitOpen;
@@ -10,26 +11,32 @@ import cb.state.CircuitStateEnum;
 import retry.RetryConfig;
 import retry.RetryThresholdException;
 import service.Service;
+import service.ServiceException;
 
 public class CircuitBreaker {
     
+    // ADR -> Dependency Inject
     private final CircuitBreakerConfig configs;
     private final RetryConfig retryConfig;      // ADR -> CB encapsulates Retry.
     private final Service service;      // ADR -> coupled service.
+    private final Failure failureStrategy;
+    private final Service fallBack;
 
-    
-    // ADR -> Encapsulated circuit states.
+
+    // ADR -> encapsulated circuit states directed graph
     private CircuitState circuitOpen, circuitHalfOpen, circuitClosed, currentState;
 
-    private CircuitBreaker(CircuitBreakerConfig configs, Service service, RetryConfig retryConfig) {
+    private CircuitBreaker(CircuitBreakerConfig configs, RetryConfig retryConfig, Service service, Failure failureStrategy, Service fallBack) {
         this.configs = configs;
         this.service = service;
         this.retryConfig = retryConfig;
+        this.failureStrategy = failureStrategy;
+        this.fallBack = fallBack;
     }
 
     // Factory method - better than an init(), which a client may fail to invoke.
-    public static CircuitBreaker getInstance(CircuitBreakerConfig configs, Service service, RetryConfig retryConfig) {
-        CircuitBreaker cb_instance = new CircuitBreaker(configs, service, retryConfig);
+    public static CircuitBreaker getInstance(CircuitBreakerConfig configs, RetryConfig retryConfig, Service service,  Failure failureStrategy, Service fallBack) {
+        CircuitBreaker cb_instance = new CircuitBreaker(configs,retryConfig, service, failureStrategy, fallBack);
 
         //  Static Coupling -> set all circuit states
         cb_instance.circuitOpen = new CircuitOpen(cb_instance);
@@ -42,7 +49,7 @@ public class CircuitBreaker {
         return cb_instance;
     }
 
-    public  <Q, S> Optional<S> handle(Q request) throws CircuitOpenException, InterruptedException, RetryThresholdException, TimeoutException {
+    public  <Q, S> Optional<S> handle(Q request) throws ServiceException, CircuitOpenException, InterruptedException, RetryThresholdException, TimeoutException {
         return this.getState().handle(request);
     }
 
@@ -76,5 +83,13 @@ public class CircuitBreaker {
 
     public CircuitBreakerConfig getConfigs() {
         return this.configs;
+    }
+
+    public Failure getFailureStrategy() {
+        return failureStrategy;
+    }
+
+    public Service getFallBack() {
+        return fallBack;
     }
 }

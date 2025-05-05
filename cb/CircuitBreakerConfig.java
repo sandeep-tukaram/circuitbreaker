@@ -3,9 +3,9 @@ package cb;
 public class CircuitBreakerConfig {
 
     // CB configs
-    public final int HALF_OPEN_THRESHOLD;
-    public final int SERVICE_FAILURE_THRESHOLD;
-    public final long OPEN_WAIT_TIME_MS;
+    private final int HALF_OPEN_THRESHOLD;
+    private final int SERVICE_FAILURE_THRESHOLD;
+    private final long OPEN_WAIT_TIME_MS;
 
 
     public CircuitBreakerConfig (long open_wait_time_ms, int half_open_threshold, int service_failure_threshold) {
