@@ -36,9 +36,10 @@ public class CircuitHalfOpen implements CircuitState {
             // Try request if half open failures is still less than the threshold.
             try {
                 response =  Retry.handle(service, request, retryConfig);
-                this.successCount++;
+                this.successCount += retryConfig.getRETRY_THRESHOLD();
             } catch (Exception e) {
-                this.failCount++;
+                this.failCount += retryConfig.getRETRY_THRESHOLD();
+                throw e;
             }
 
             // Static coupling -> Trasition to Closed circuit when success hit threshold

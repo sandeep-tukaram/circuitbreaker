@@ -14,39 +14,34 @@ import service.Service;
 public class CircuitClosed implements CircuitState {
 
     private final CircuitBreaker circuitBreaker;
-    private Map<Service, Integer> serviceFailCounter;
+    private int failCounter;
 
     public CircuitClosed(CircuitBreaker circuitBreaker) {
         this.circuitBreaker = circuitBreaker;
     }
 
     @Override
-    public <Q, S> Optional<S> handle(Q request) throws CircuitOpenException, InterruptedException, TimeoutException {
+    public <Q, S> Optional<S> handle(Q request) throws CircuitOpenException, RetryThresholdException, InterruptedException, TimeoutException {
         Service service = this.circuitBreaker.getService();
         CircuitBreakerConfig configs = this.circuitBreaker.getConfigs();
         RetryConfig retryConfig = this.circuitBreaker.getRetryConfig();
 
-        if(this.serviceFailCounter.get(service) == null) {
-            this.serviceFailCounter.put(service, 0);
-        }
-
         Optional<S> response = Optional.empty();
 
         while (true) {
-            // Transistion from Closed to Open
-            if (this.serviceFailCounter.get(service) > configs.SERVICE_FAILURE_THRESHOLD) {
-                this.circuitBreaker.transition(CircuitStateEnum.OPEN);
-                throw new CircuitOpenException("Service failure threshold hit");
-            }
-
-
             try {
+                //Static Coupling -> transition state to OPEN
+                if (this.failCounter > configs.SERVICE_FAILURE_THRESHOLD) {
+                    response = this.circuitBreaker.transition(CircuitStateEnum.OPEN).handle(request);
+                }
+
                 response = Retry.handle(service, request, retryConfig);
-                this.serviceFailCounter.put(service,0);    // reset failure counts upon successful service response.
+                this.failCounter = 0;   // reset failure counts upon successful service response.
                 break;
-            } catch (RetryThresholdException rt) {
-                this.serviceFailCounter.compute(service, (key, value) ->value + retryConfig.getRETRY_THRESHOLD());
-            }            
+            } catch (Exception e) {
+                this.failCounter = failCounter +  retryConfig.getRETRY_THRESHOLD();
+                throw e;
+            }
         }
 
         return response;
