@@ -33,11 +33,11 @@ public class CircuitOpen implements CircuitState {
                 }
             }
 
-            // transition state to HalfOpen
-            this.circuitBreaker.transition(CircuitStateEnum.HALF_OPEN);
-            return this.circuitBreaker.getState().handle(request);
+            //Static Coupling -> transition state to HalfOpen
+            return this.circuitBreaker.transition(CircuitStateEnum.HALF_OPEN).handle(request);
         }
 
+        // Initiatize opened state.
         public void init() {
             this.openedInstant = System.currentTimeMillis();
         }

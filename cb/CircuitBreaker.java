@@ -14,10 +14,15 @@ import service.Service;
 public class CircuitBreaker {
     
     private final CircuitBreakerConfig configs;
+    
+    
+    // ADR -> Encapsulated circuit states.
     private CircuitState circuitOpen, circuitHalfOpen, circuitClosed, currentState;
 
     // mapped/coupled service object.
     private final Service service;
+
+    // ADR -> CB encapsulates Retry
     private final RetryConfig retryConfig;
 
     // private constructor. The state objects needs this object for instantiation.
@@ -44,7 +49,7 @@ public class CircuitBreaker {
         return this.getState().handle(request);
     }
 
-    public void transition(CircuitStateEnum circuitStateEnum) {
+    public CircuitState transition(CircuitStateEnum circuitStateEnum) {
         switch (circuitStateEnum) {
             case OPEN:
                 this.currentState = this.circuitOpen;
@@ -56,6 +61,8 @@ public class CircuitBreaker {
             default:
                 this.currentState = this.circuitClosed;
         }
+
+        return this.currentState;
     }
 
     public CircuitState getState() {
