@@ -7,6 +7,11 @@ public class AggregateCounter {
     private Map<TimeWindow, Integer> aggregator = new HashMap<TimeWindow, Integer>();
     private TimeWindow currentTimeWindow;
 
+    public AggregateCounter() {
+        this.currentTimeWindow = new TimeWindow(System.currentTimeMillis());
+        this.aggregator.put(currentTimeWindow, 0);
+
+    }
 
     public Integer increment(int val) {
         if (System.currentTimeMillis() - this.currentTimeWindow.getStartTime_MS() < this.currentTimeWindow.getWindowSize_MS()) {
@@ -19,6 +24,10 @@ public class AggregateCounter {
         }
 
         return this.aggregator.get(this.currentTimeWindow);
+    }
+
+    public Map<TimeWindow, Integer> getAggregator() {
+        return aggregator;
     }
 
 }

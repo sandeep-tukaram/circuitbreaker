@@ -1,7 +1,7 @@
 package cb.counters;
 
 public class TimeWindow {
-    private final static int DEFAULT_WINDOW_SIZE_MS = 10000;    // 10s
+    private final static int DEFAULT_WINDOW_SIZE_MS = 10_000;    // 10s
     private final long startTime_MS;
     private final int windowSize_MS;
 
@@ -20,6 +20,11 @@ public class TimeWindow {
 
     public int getWindowSize_MS() {
         return windowSize_MS;
+    }
+
+    @Override
+    public String toString() {
+        return "start: " + startTime_MS + ", size: " + windowSize_MS;
     }
 
 }
