@@ -1,14 +1,12 @@
 package cb.counters;
 
-public class TimeBasedFailures implements Counter {
-
-
+public class TimeWindowCounter implements Counter {
     private final long TIME_WINDOW;
     private final int THRESHOLD;
     private int count;
     private long window_start;
 
-    public TimeBasedFailures(int threshold, long timeWindow) {
+    public TimeWindowCounter(int threshold, long timeWindow) {
         this.THRESHOLD = threshold;
         this.TIME_WINDOW = timeWindow;
     }

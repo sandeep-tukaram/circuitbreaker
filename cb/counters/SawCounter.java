@@ -1,10 +1,12 @@
 package cb.counters;
 
-public class CountFailure implements Counter {
+// Named inspired by saw function in mathematics.
+// Monotically increases from base to threshold and resets.
+public class SawCounter implements Counter {
     private final int THRESHOLD;
     private int count;
 
-    public CountFailure(int threshold) {
+    public SawCounter(int threshold) {
         this.THRESHOLD = threshold;
     }
 
