@@ -36,6 +36,8 @@ public class CircuitBreaker<Q, S> {
     private EventBus<CircuitState<Q,S>> eventBus;
 
 
+  
+
     private CircuitBreaker(CircuitBreakerConfig configs, RetryConfig retryConfig, Service<Q, S> service, Counter failureStrategy, Service<Q, S> fallBack) {
         this.configs = configs;
         this.retryConfig = retryConfig;
@@ -111,5 +113,9 @@ public class CircuitBreaker<Q, S> {
 
     public CBMetrics getMetrics() {
         return metrics;
+    }
+
+    public EventBus<CircuitState<Q, S>> getEventBus() {
+        return eventBus;
     }
 }

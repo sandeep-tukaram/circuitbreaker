@@ -37,7 +37,7 @@ public class CircuitClosedTest {
             // Check transition
             if  (!(circuitBreaker.getState() instanceof CircuitClosed)) 
                 throw new AssertionError("Wrong state transition");
-
+            
         } catch (Exception e) {
             // Check success
             throw new AssertionError("Expected -> Successful closed circuit request", e);
@@ -51,7 +51,7 @@ public class CircuitClosedTest {
         System.out.println("Test start -> testCloseThreshold()");
 
         Service<String, Integer> service = request -> Optional.of(Integer.parseInt(request));
-        Service<String, Integer> fallback = request -> Optional.of(Integer.valueOf(200));   // no fallback
+        // Service<String, Integer> fallback = request -> Optional.of(Integer.valueOf(200));   // no fallback
 
         RetryConfig retryconfig = new RetryConfig(10, 4);
 

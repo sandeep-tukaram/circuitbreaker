@@ -53,7 +53,7 @@ public class RetryTest {
 
         try{
             // 200 OK
-            Optional<Integer> result = Retry.handle(service, "200", config);
+            Retry.handle(service, "200", config);
             throw new AssertionError("Expected -> RetryThresholdException thrown");
         } catch (Exception e) {
             if (!(e instanceof RetryThresholdException)) 
