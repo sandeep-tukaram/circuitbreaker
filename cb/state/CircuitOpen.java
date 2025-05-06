@@ -10,16 +10,16 @@ import service.ServiceException;
 
 // Represents Circuit Open state. 
 // Handle transition. Open -> HalfOpen.
-public class CircuitOpen implements CircuitState {
+public class CircuitOpen<Q, S> implements CircuitState<Q, S> {
 
         private long openedInstant = -1l;   // -1l implicitly indicates circuit is not currently open.
-        private final CircuitBreaker circuitBreaker;  
+        private final CircuitBreaker<Q, S> circuitBreaker;  
 
-        public CircuitOpen(CircuitBreaker circuitBreaker) {
+        public CircuitOpen(CircuitBreaker<Q, S> circuitBreaker) {
             this.circuitBreaker = circuitBreaker;
         }
 
-        public  <Q, S> Optional<S> handle(Q request) throws CircuitOpenException, InterruptedException, RetryThresholdException, TimeoutException, ServiceException {
+        public  Optional<S> handle(Q request) throws CircuitOpenException, InterruptedException, RetryThresholdException, TimeoutException, ServiceException {
             CircuitBreakerConfig configs = this.circuitBreaker.getConfigs();
 
             if (openedInstant != -1l) {

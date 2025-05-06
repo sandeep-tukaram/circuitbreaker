@@ -12,16 +12,16 @@ import retry.RetryThresholdException;
 import service.Service;
 import service.ServiceException;
 
-public class CircuitHalfOpen implements CircuitState {
-        private final CircuitBreaker circuitBreaker;
+public class CircuitHalfOpen<Q,S> implements CircuitState<Q,S> {
+        private final CircuitBreaker<Q,S> circuitBreaker;
         private int successCount;
 
-        public CircuitHalfOpen(CircuitBreaker circuitBreaker) {
+        public CircuitHalfOpen(CircuitBreaker<Q,S> circuitBreaker) {
             this.circuitBreaker = circuitBreaker;
         }
 
-        public  <Q, S> Optional<S> handle(Q request) throws CircuitOpenException, RetryThresholdException, InterruptedException, TimeoutException, ServiceException {
-            Service service = this.circuitBreaker.getService();
+        public Optional<S> handle(Q request) throws CircuitOpenException, RetryThresholdException, InterruptedException, TimeoutException, ServiceException {
+            Service<Q,S>  service = this.circuitBreaker.getService();
             CircuitBreakerConfig configs = this.circuitBreaker.getConfigs();
             RetryConfig retryConfig = this.circuitBreaker.getRetryConfig();
             Counter failCounter = this.circuitBreaker.getFailureStrategy();

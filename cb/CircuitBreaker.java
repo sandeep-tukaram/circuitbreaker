@@ -16,27 +16,27 @@ import retry.RetryThresholdException;
 import service.Service;
 import service.ServiceException;
 
-public class CircuitBreaker {
+public class CircuitBreaker<Q, S> {
     
     // ADR -> Dependency Inject configs and wrap service and fallback service.
     private final CircuitBreakerConfig configs;
     private final RetryConfig retryConfig;      // ADR -> CB encapsulates Retry.
-    private final Service service;      // ADR -> coupled service.
+    private final Service<Q, S> service;      // ADR -> coupled service.
     private final Counter failureStrategy; // SawCounter or TimeWindowCounter
-    private final Service fallBack;
+    private final Service<Q, S> fallBack;
 
     // Metrics
     private final CBMetrics metrics;
 
     // ADR -> encapsulated circuit states directed graph
-    private CircuitState circuitOpen, circuitHalfOpen, circuitClosed, currentState;
+    private CircuitState<Q,S> circuitOpen, circuitHalfOpen, circuitClosed, currentState;
 
 
     // ADR -> event system for circuit state
-    private EventBus<CircuitState> eventBus;
+    private EventBus<CircuitState<Q,S>> eventBus;
 
 
-    private CircuitBreaker(CircuitBreakerConfig configs, RetryConfig retryConfig, Service service, Counter failureStrategy, Service fallBack) {
+    private CircuitBreaker(CircuitBreakerConfig configs, RetryConfig retryConfig, Service<Q, S> service, Counter failureStrategy, Service<Q, S> fallBack) {
         this.configs = configs;
         this.service = service;
         this.retryConfig = retryConfig;
@@ -46,13 +46,13 @@ public class CircuitBreaker {
     }
 
     // Factory method - better than an init(), which a client may fail to invoke.
-    public static CircuitBreaker getInstance(CircuitBreakerConfig configs, RetryConfig retryConfig, Service service,  Counter failureStrategy, Service fallBack) {
-        CircuitBreaker cb_instance = new CircuitBreaker(configs,retryConfig, service, failureStrategy, fallBack);
+    public static <Q,S> CircuitBreaker<Q, S> getInstance(CircuitBreakerConfig configs, RetryConfig retryConfig, Service<Q,S> service,  Counter failureStrategy, Service<Q,S> fallBack) {
+        CircuitBreaker<Q,S> cb_instance = new CircuitBreaker<Q,S>(configs,retryConfig, service, failureStrategy, fallBack);
 
         //  Static Coupling -> set all circuit states
-        cb_instance.circuitOpen = new CircuitOpen(cb_instance);
-        cb_instance.circuitHalfOpen = new CircuitHalfOpen(cb_instance);
-        cb_instance.circuitClosed = new CircuitClosed(cb_instance);
+        cb_instance.circuitOpen = new CircuitOpen<Q,S>(cb_instance);
+        cb_instance.circuitHalfOpen = new CircuitHalfOpen<Q,S>(cb_instance);
+        cb_instance.circuitClosed = new CircuitClosed<Q,S> (cb_instance);
 
         // Initialize current state to CLOSED
         cb_instance.currentState = cb_instance.transition(CircuitStateEnum.CLOSED);
@@ -60,11 +60,11 @@ public class CircuitBreaker {
         return cb_instance;
     }
 
-    public  <Q, S> Optional<S> handle(Q request) throws ServiceException, CircuitOpenException, InterruptedException, RetryThresholdException, TimeoutException {
+    public Optional<S> handle(Q request) throws ServiceException, CircuitOpenException, InterruptedException, RetryThresholdException, TimeoutException {
         return this.getState().handle(request);
     }
 
-    public CircuitState transition(CircuitStateEnum circuitStateEnum) {
+    public CircuitState<Q, S> transition(CircuitStateEnum circuitStateEnum) {
         switch (circuitStateEnum) {
             case OPEN:
                 this.currentState = this.circuitOpen;
@@ -82,11 +82,11 @@ public class CircuitBreaker {
         return this.currentState;
     }
 
-    public CircuitState getState() {
+    public CircuitState<Q, S> getState() {
         return this.currentState;
     }
 
-    public Service getService() {
+    public Service<Q, S> getService() {
         return this.service;
     }
 
@@ -102,7 +102,7 @@ public class CircuitBreaker {
         return failureStrategy;
     }
 
-    public Service getFallBack() {
+    public Service<Q,S> getFallBack() {
         return fallBack;
     }
 

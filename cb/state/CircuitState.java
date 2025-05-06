@@ -8,8 +8,8 @@ import cb.CircuitOpenException;
 import retry.RetryThresholdException;
 import service.ServiceException;
 
-public interface CircuitState {
+public interface CircuitState<Q, S> {
 
-    public  <Q, S> Optional<S> handle(Q request) throws ServiceException, CircuitOpenException, InterruptedException, RetryThresholdException, TimeoutException;
+    public  Optional<S> handle(Q request) throws ServiceException, CircuitOpenException, InterruptedException, RetryThresholdException, TimeoutException;
 
 }
