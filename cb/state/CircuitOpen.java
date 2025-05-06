@@ -26,11 +26,13 @@ public class CircuitOpen implements CircuitState {
                 if ((System.currentTimeMillis() - openedInstant) <= configs.getOPEN_WAIT_TIME_MS()) {
                     // circuit is open
                     if (this.circuitBreaker.getFallBack() == null) {
+                        this.circuitBreaker.getMetrics().recordFailure(CircuitStateEnum.OPEN, 1);
                         throw new CircuitOpenException("Circuit Open. Retry after - " + 
                         (configs.getOPEN_WAIT_TIME_MS() - ((System.currentTimeMillis() - openedInstant))));
                     }
 
                     // invoke fallback
+                    this.circuitBreaker.getMetrics().recordFailure(CircuitStateEnum.OPEN,1);
                     return this.circuitBreaker.getFallBack().run(request);
 
                 } else {

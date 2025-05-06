@@ -10,6 +10,7 @@ import cb.state.CircuitState;
 import cb.state.CircuitStateEnum;
 import event.Event;
 import event.EventBus;
+import metrics.CBMetrics;
 import retry.RetryConfig;
 import retry.RetryThresholdException;
 import service.Service;
@@ -23,6 +24,9 @@ public class CircuitBreaker {
     private final Service service;      // ADR -> coupled service.
     private final Counter failureStrategy; // SawCounter or TimeWindowCounter
     private final Service fallBack;
+
+    // Metrics
+    private final CBMetrics metrics;
 
     // ADR -> encapsulated circuit states directed graph
     private CircuitState circuitOpen, circuitHalfOpen, circuitClosed, currentState;
@@ -38,6 +42,7 @@ public class CircuitBreaker {
         this.retryConfig = retryConfig;
         this.failureStrategy = failureStrategy;
         this.fallBack = fallBack;
+        this.metrics = new CBMetrics();
     }
 
     // Factory method - better than an init(), which a client may fail to invoke.
@@ -99,5 +104,9 @@ public class CircuitBreaker {
 
     public Service getFallBack() {
         return fallBack;
+    }
+
+    public CBMetrics getMetrics() {
+        return metrics;
     }
 }

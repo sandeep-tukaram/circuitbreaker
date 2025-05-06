@@ -35,10 +35,14 @@ public class CircuitClosed implements CircuitState {
                 }
 
                 response = Retry.handle(service, request, retryConfig);
+
                 failCounter.reset();   // reset failure counts upon successful service response.
+                this.circuitBreaker.getMetrics().recordSuccess(CircuitStateEnum.CLOSED, 1);
+                
                 break;
             } catch (Exception e) {
                 failCounter.increment(retryConfig.getRETRY_THRESHOLD());
+                this.circuitBreaker.getMetrics().recordFailure(CircuitStateEnum.CLOSED, retryConfig.getRETRY_THRESHOLD());
                 throw e;
             }
         }
