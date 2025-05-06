@@ -1,7 +1,7 @@
 package cb.counters;
 
 public class TimeWindowCounter implements Counter {
-    private final long TIME_WINDOW; // TODO reuse TimeWindow abstraction
+    private final long TIME_WINDOW; //TODO reuse TimeWindow abstraction
     private final int THRESHOLD;
     private int count;
     private long window_start;
