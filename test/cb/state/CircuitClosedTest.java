@@ -14,7 +14,7 @@ import service.Service;
 public class CircuitClosedTest {
     public static void main(String[] args) {
         testSuccess();
-        testCloseThreshold();
+        testOpenTransition();
     }
 
     private static void testSuccess() {
@@ -47,7 +47,7 @@ public class CircuitClosedTest {
     }
 
 
-    private static void testCloseThreshold() {
+    private static void testOpenTransition() {
         System.out.println("Test start -> testCloseThreshold()");
 
         Service<String, Integer> service = request -> Optional.of(Integer.parseInt(request));
