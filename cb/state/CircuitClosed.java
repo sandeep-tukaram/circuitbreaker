@@ -20,7 +20,10 @@ public class CircuitClosed<Q,S>  implements CircuitState<Q,S>  {
     }
 
     @Override
-    public Optional<S> handle(Q request) throws ServiceException, CircuitOpenException, RetryThresholdException, InterruptedException, TimeoutException {
+    public Optional<S> handle(Q request) throws ServiceException, CircuitOpenException, RetryThresholdException, InterruptedException, TimeoutException, IllegalAccessException {
+        if(!(this.circuitBreaker.getState() instanceof CircuitClosed)) throw new IllegalAccessException("Circuit state is not Closed");
+
+        
         Service<Q,S>  service = this.circuitBreaker.getService();
         RetryConfig retryConfig = this.circuitBreaker.getRetryConfig();
         Counter failCounter = this.circuitBreaker.getFailureStrategy();

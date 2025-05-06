@@ -19,7 +19,9 @@ public class CircuitOpen<Q, S> implements CircuitState<Q, S> {
             this.circuitBreaker = circuitBreaker;
         }
 
-        public  Optional<S> handle(Q request) throws CircuitOpenException, InterruptedException, RetryThresholdException, TimeoutException, ServiceException {
+        public  Optional<S> handle(Q request) throws CircuitOpenException, InterruptedException, RetryThresholdException, TimeoutException, ServiceException, IllegalAccessException {
+            if(!(this.circuitBreaker.getState() instanceof CircuitOpen)) throw new IllegalAccessException("Circuit state is not Open");
+
             CircuitBreakerConfig configs = this.circuitBreaker.getConfigs();
 
             if (openedInstant != -1l) {

@@ -10,6 +10,6 @@ import service.ServiceException;
 
 public interface CircuitState<Q, S> {
 
-    public  Optional<S> handle(Q request) throws ServiceException, CircuitOpenException, InterruptedException, RetryThresholdException, TimeoutException;
+    public  Optional<S> handle(Q request) throws ServiceException, CircuitOpenException, InterruptedException, RetryThresholdException, TimeoutException, IllegalAccessException;
 
 }

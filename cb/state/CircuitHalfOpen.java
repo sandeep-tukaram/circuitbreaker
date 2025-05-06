@@ -20,13 +20,23 @@ public class CircuitHalfOpen<Q,S> implements CircuitState<Q,S> {
             this.circuitBreaker = circuitBreaker;
         }
 
-        public Optional<S> handle(Q request) throws CircuitOpenException, RetryThresholdException, InterruptedException, TimeoutException, ServiceException {
+        public Optional<S> handle(Q request) throws CircuitOpenException, RetryThresholdException, InterruptedException, TimeoutException, ServiceException, IllegalAccessException {
+            if (!(this.circuitBreaker.getState() instanceof CircuitHalfOpen)) throw new IllegalAccessException("Circuit state is not Half Open");
+
             Service<Q,S>  service = this.circuitBreaker.getService();
             CircuitBreakerConfig configs = this.circuitBreaker.getConfigs();
             RetryConfig retryConfig = this.circuitBreaker.getRetryConfig();
             Counter failCounter = this.circuitBreaker.getFailureStrategy();
 
             Optional<S> response = Optional.empty();
+
+            // Static coupling -> Trasition to Closed circuit when success hit threshold
+            if (this.successCount > configs.getHALF_OPEN_THRESHOLD()) {
+                this.successCount = 0;
+                return this.circuitBreaker.transition(CircuitStateEnum.CLOSED).handle(request);
+            }
+
+
 
             // Static coupling -> Transition to Open circuit when failures hit threshold
             if (failCounter.hitThreshold()) {
@@ -43,12 +53,6 @@ public class CircuitHalfOpen<Q,S> implements CircuitState<Q,S> {
                 this.circuitBreaker.getMetrics().recordFailure(CircuitStateEnum.HALF_OPEN, retryConfig.getRETRY_THRESHOLD());
                 failCounter.increment(retryConfig.getRETRY_THRESHOLD());
                 throw e;
-            }
-
-            // Static coupling -> Trasition to Closed circuit when success hit threshold
-            if (this.successCount > configs.getHALF_OPEN_THRESHOLD()) {
-                this.successCount = 0;
-                response = this.circuitBreaker.transition(CircuitStateEnum.CLOSED).handle(request);
             }
 
             return response;
