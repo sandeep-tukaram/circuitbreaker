@@ -1,7 +1,7 @@
-package cb.fail;
+package cb.counters;
 
 // Strategy pattern
-public interface Failure {
+public interface Counter {
     boolean hitThreshold();
     int reset();
     int increment(int val);

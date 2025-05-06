@@ -1,6 +1,6 @@
-package cb.fail;
+package cb.counters;
 
-public class CountFailure implements Failure {
+public class CountFailure implements Counter {
     private final int THRESHOLD;
     private int count;
 

@@ -1,6 +1,6 @@
-package cb.fail;
+package cb.counters;
 
-public class TimeBasedFailures implements Failure {
+public class TimeBasedFailures implements Counter {
 
 
     private final long TIME_WINDOW;
