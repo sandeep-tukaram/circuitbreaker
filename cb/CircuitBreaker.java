@@ -68,7 +68,7 @@ public class CircuitBreaker<Q, S> {
         switch (circuitStateEnum) {
             case OPEN:
                 this.currentState = this.circuitOpen;
-                ((CircuitOpen)this.circuitOpen).init();
+                ((CircuitOpen<Q,S> )this.circuitOpen).init();
                 break;
             case HALF_OPEN:
                 this.currentState = this.circuitHalfOpen;
@@ -78,7 +78,7 @@ public class CircuitBreaker<Q, S> {
         }
 
         // publish state change
-        this.eventBus.publish(new Event<CircuitState>(this.currentState));
+        this.eventBus.publish(new Event<CircuitState<Q,S> >(this.currentState));
         return this.currentState;
     }
 
