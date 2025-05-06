@@ -38,10 +38,13 @@ public class CircuitBreaker<Q, S> {
 
     private CircuitBreaker(CircuitBreakerConfig configs, RetryConfig retryConfig, Service<Q, S> service, Counter failureStrategy, Service<Q, S> fallBack) {
         this.configs = configs;
-        this.service = service;
         this.retryConfig = retryConfig;
         this.failureStrategy = failureStrategy;
+
+        this.service = service;
         this.fallBack = fallBack;
+
+        this.eventBus = new EventBus<CircuitState<Q,S>>();
         this.metrics = new CBMetrics();
     }
 
