@@ -3,8 +3,9 @@ package service;
 // Q -> reQuest object type
 // S -> reSponse object type
 
+import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 
-public interface Service {
-   <Q, S> S run(Q request) throws ServiceException, TimeoutException;
+public interface Service<Q, S> {
+   Optional<S> run(Q request) throws ServiceException, TimeoutException;
 }
