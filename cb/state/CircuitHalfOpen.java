@@ -5,7 +5,7 @@ import java.util.concurrent.TimeoutException;
 import cb.CircuitBreaker;
 import cb.CircuitBreakerConfig;
 import cb.CircuitOpenException;
-import cb.fail.Failure;
+import cb.counters.Counter;
 import retry.Retry;
 import retry.RetryConfig;
 import retry.RetryThresholdException;
@@ -24,13 +24,13 @@ public class CircuitHalfOpen implements CircuitState {
             Service service = this.circuitBreaker.getService();
             CircuitBreakerConfig configs = this.circuitBreaker.getConfigs();
             RetryConfig retryConfig = this.circuitBreaker.getRetryConfig();
-            Failure failureStrategy = this.circuitBreaker.getFailureStrategy();
+            Counter failCounter = this.circuitBreaker.getFailureStrategy();
 
             Optional<S> response = Optional.empty();
 
             // Static coupling -> Transition to Open circuit when failures hit threshold
-            if (failureStrategy.hitThreshold()) {
-                failureStrategy.reset();
+            if (failCounter.hitThreshold()) {
+                failCounter.reset();
                 response =  this.circuitBreaker.transition(CircuitStateEnum.OPEN).handle(request);
             }
             
@@ -39,7 +39,7 @@ public class CircuitHalfOpen implements CircuitState {
                 response =  Retry.handle(service, request, retryConfig);
                 this.successCount += retryConfig.getRETRY_THRESHOLD();
             } catch (Exception e) {
-                failureStrategy.increment(retryConfig.getRETRY_THRESHOLD());
+                failCounter.increment(retryConfig.getRETRY_THRESHOLD());
                 throw e;
             }
 

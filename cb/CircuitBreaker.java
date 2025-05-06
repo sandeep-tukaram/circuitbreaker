@@ -2,7 +2,7 @@ package cb;
 import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 
-import cb.fail.Failure;
+import cb.counters.Counter;
 import cb.state.CircuitClosed;
 import cb.state.CircuitHalfOpen;
 import cb.state.CircuitOpen;
@@ -21,7 +21,7 @@ public class CircuitBreaker {
     private final CircuitBreakerConfig configs;
     private final RetryConfig retryConfig;      // ADR -> CB encapsulates Retry.
     private final Service service;      // ADR -> coupled service.
-    private final Failure failureStrategy;
+    private final Counter failureStrategy; // SawCounter or TimeWindowCounter
     private final Service fallBack;
 
     // ADR -> encapsulated circuit states directed graph
@@ -32,7 +32,7 @@ public class CircuitBreaker {
     private EventBus<CircuitState> eventBus;
 
 
-    private CircuitBreaker(CircuitBreakerConfig configs, RetryConfig retryConfig, Service service, Failure failureStrategy, Service fallBack) {
+    private CircuitBreaker(CircuitBreakerConfig configs, RetryConfig retryConfig, Service service, Counter failureStrategy, Service fallBack) {
         this.configs = configs;
         this.service = service;
         this.retryConfig = retryConfig;
@@ -41,7 +41,7 @@ public class CircuitBreaker {
     }
 
     // Factory method - better than an init(), which a client may fail to invoke.
-    public static CircuitBreaker getInstance(CircuitBreakerConfig configs, RetryConfig retryConfig, Service service,  Failure failureStrategy, Service fallBack) {
+    public static CircuitBreaker getInstance(CircuitBreakerConfig configs, RetryConfig retryConfig, Service service,  Counter failureStrategy, Service fallBack) {
         CircuitBreaker cb_instance = new CircuitBreaker(configs,retryConfig, service, failureStrategy, fallBack);
 
         //  Static Coupling -> set all circuit states
@@ -93,7 +93,7 @@ public class CircuitBreaker {
         return this.configs;
     }
 
-    public Failure getFailureStrategy() {
+    public Counter getFailureStrategy() {
         return failureStrategy;
     }
 
