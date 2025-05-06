@@ -65,7 +65,7 @@ public class CircuitBreaker<Q, S> {
         return cb_instance;
     }
 
-    public Optional<S> handle(Q request) throws ServiceException, CircuitOpenException, InterruptedException, RetryThresholdException, TimeoutException {
+    public Optional<S> handle(Q request) throws ServiceException, CircuitOpenException, InterruptedException, RetryThresholdException, TimeoutException, IllegalAccessException {
         return this.getState().handle(request);
     }
 
